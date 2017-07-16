@@ -6,6 +6,7 @@ import android.text.InputFilter
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
 
 /**
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private val userName by lazy { ANONYMOUS }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
