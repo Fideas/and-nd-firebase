@@ -21,7 +21,7 @@ class MessageAdapter(
                 (context as Activity).layoutInflater.inflate(R.layout.item_message, parent, false)
 
         val message = getItem(position)
-        if (!message.photoUrl.isEmpty()){
+        if (message.photoUrl != null){
             with(view){
                 messageTextView.visibility = View.GONE
                 photoImageView.visibility = View.VISIBLE

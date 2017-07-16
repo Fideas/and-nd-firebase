@@ -6,8 +6,11 @@ import android.text.InputFilter
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.google.firebase.database.DatabaseReference
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * Created by Nicolas Carrasco S on 7/16/2017.
@@ -17,6 +20,8 @@ class MainActivity : AppCompatActivity() {
     val ANONYMOUS = "anonymous"
     val DEFAULT_MSG_LENGTH_LIMIT = 1000
     private val userName by lazy { ANONYMOUS }
+
+    @Inject @field:[Named("messages")] lateinit var messageDatabaseReference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
@@ -34,12 +39,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         messageEditText.onTextChangedListener {
-            s, _, _, _ -> sendButton.isEnabled = s?.isNotEmpty() ?: false  }
+            s, _, _, _ ->
+            sendButton.isEnabled = s?.isNotEmpty() ?: false
+        }
 
         messageEditText.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT))
 
         sendButton.setOnClickListener {
-            // TODO: Send messages on click
+            val message = FriendlyMessage(messageEditText.text.toString(), userName, null)
+            messageDatabaseReference.push().setValue(message)
             messageEditText.setText("")
         }
     }
