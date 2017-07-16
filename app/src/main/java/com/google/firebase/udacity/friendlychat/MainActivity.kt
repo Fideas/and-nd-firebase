@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
             messageDatabaseReference.push().setValue(message)
             messageEditText.setText("")
         }
+        messageDatabaseReference.addChildEventListener(MessageEventListener(messageAdapter))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
