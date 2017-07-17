@@ -21,20 +21,22 @@ class MessageAdapter(
                 (context as Activity).layoutInflater.inflate(R.layout.item_message, parent, false)
 
         val message = getItem(position)
-        if (!message.photoUrl.isEmpty()){
-            with(view){
+        with(view) {
+            if (message.photoUrl != null) {
+
                 messageTextView.visibility = View.GONE
                 photoImageView.visibility = View.VISIBLE
                 Picasso.with(context)
                         .load(message.photoUrl)
                         .into(photoImageView)
-            }
-        } else {
-            with(view){
+            } else {
+
                 messageTextView.visibility = View.VISIBLE
                 photoImageView.visibility = View.GONE
                 messageTextView.text = message.text
+
             }
+            nameTextView.text = message.name
         }
         return view
     }
