@@ -20,7 +20,6 @@ class ChatApplication : Application(), HasActivityInjector {
 
     override fun onCreate() {
         super.onCreate()
-
         graph.inject(this)
     }
 
