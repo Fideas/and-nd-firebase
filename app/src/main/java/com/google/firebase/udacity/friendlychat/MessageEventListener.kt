@@ -11,15 +11,15 @@ import com.google.firebase.database.DatabaseError
 class MessageEventListener(val adapter: ArrayAdapter<FriendlyMessage>): ChildEventListener{
 
     override fun onCancelled(p0: DatabaseError?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 
     override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 
     override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 
     override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
@@ -27,6 +27,6 @@ class MessageEventListener(val adapter: ArrayAdapter<FriendlyMessage>): ChildEve
     }
 
     override fun onChildRemoved(p0: DataSnapshot?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //TODO("not implemented")
     }
 }

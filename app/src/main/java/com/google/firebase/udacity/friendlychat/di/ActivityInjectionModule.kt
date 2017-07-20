@@ -1,6 +1,7 @@
 package com.google.firebase.udacity.friendlychat.di
 
-import com.google.firebase.udacity.friendlychat.MainActivity
+import com.google.firebase.udacity.friendlychat.SignedInActivity
+import com.google.firebase.udacity.friendlychat.SignedOutActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -10,5 +11,8 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class ActivityInjectionModule{
     @ContributesAndroidInjector
-    abstract fun contributesMainActivity(): MainActivity
+    abstract fun contributesSignedInActivity(): SignedInActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributesSignedOutActivity(): SignedOutActivity
 }
