@@ -26,7 +26,6 @@ class NavigationController(val activity: AppCompatActivity,
                                         AuthUI.IdpConfig.Builder(AuthUI.GOOGLE_PROVIDER).build()))
                         .build(),
                 RC_SIGN_IN)
-        activity.finish()
     }
 
     fun navigateToSignOut() {

@@ -34,6 +34,7 @@ class SignedOutActivity: AppCompatActivity(){
         when(requestCode){
             NavigationController.RC_SIGN_IN -> {
                 if (resultCode == ResultCodes.OK) navigationController.navigateToSignedIn()
+                else finish()
             }
             else ->{}
         }
