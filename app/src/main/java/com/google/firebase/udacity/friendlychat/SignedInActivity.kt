@@ -1,5 +1,7 @@
 package com.google.firebase.udacity.friendlychat
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.InputFilter
@@ -9,6 +11,7 @@ import android.view.View
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.storage.StorageReference
 import com.google.firebase.udacity.friendlychat.ui.common.NavigationController
 import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,6 +28,7 @@ class SignedInActivity : AppCompatActivity() {
     private val userName by lazy { auth.currentUser?.displayName ?: ANONYMOUS }
 
     @field:[Inject Named("messages")] lateinit var messageDatabaseReference: DatabaseReference
+    @field:[Inject Named("chat_photos")] lateinit var chatPhotoStorageReference: StorageReference
     @Inject lateinit var auth: FirebaseAuth
     @Inject lateinit var authUI: AuthUI
     val navigationController by lazy { NavigationController(this, authUI) }
@@ -45,7 +49,7 @@ class SignedInActivity : AppCompatActivity() {
         progressBar.visibility = View.INVISIBLE
 
         photoPickerButton.setOnClickListener {
-            // TODO: Fire an intent to show an image picker
+            navigationController.navigateToPhotoPicker()
         }
 
         messageEditText.onTextChangedListener {
@@ -73,5 +77,31 @@ class SignedInActivity : AppCompatActivity() {
             R.id.sign_out_menu -> navigationController.navigateToSignOut()
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            NavigationController.RC_PHOTO_PICKER -> {
+                when (resultCode) {
+                    Activity.RESULT_OK -> {
+                        val selectedUri = data?.data
+                        val photoRef = chatPhotoStorageReference.child(selectedUri?.lastPathSegment!!)
+
+                        photoRef.putFile(selectedUri)
+                                .addOnSuccessListener { it ->
+                                    messageDatabaseReference
+                                            .push()
+                                            .setValue(FriendlyMessage(
+                                                    null,
+                                                    userName,
+                                                    it.downloadUrl.toString()
+                                            ))
+                                }
+
+                    }
+                }
+            }
+        }
     }
 }

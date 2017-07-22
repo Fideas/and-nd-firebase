@@ -14,6 +14,7 @@ class NavigationController(val activity: AppCompatActivity,
 
     companion object {
         val RC_SIGN_IN = 10
+        val RC_PHOTO_PICKER = 20
     }
 
     fun navigateToSignIn() {
@@ -40,5 +41,15 @@ class NavigationController(val activity: AppCompatActivity,
     fun navigateToSignedIn() {
         activity.startActivity(Intent(activity, SignedInActivity::class.java))
         activity.finish()
+    }
+
+    fun navigateToPhotoPicker() {
+        with(activity) {
+            startActivityForResult(
+                    Intent(Intent.ACTION_GET_CONTENT)
+                            .setType("image/jpg")
+                            .putExtra(Intent.EXTRA_LOCAL_ONLY, true),
+                    RC_PHOTO_PICKER)
+        }
     }
 }
