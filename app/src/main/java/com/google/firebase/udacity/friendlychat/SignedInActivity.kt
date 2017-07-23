@@ -5,12 +5,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.text.InputFilter
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.udacity.friendlychat.ui.common.NavigationController
 import dagger.android.AndroidInjection
@@ -23,14 +25,20 @@ import javax.inject.Named
  */
 class SignedInActivity : AppCompatActivity() {
 
+    companion object {
+        val DEFAULT_MSG_LENGTH_LIMIT = 1000
+        val FRIENDLY_MSG_LENGTH_KEY = "friendly_msg_length"
+    }
+
+    val TAG = SignedInActivity::class.java.simpleName
     val ANONYMOUS = "anonymous"
-    val DEFAULT_MSG_LENGTH_LIMIT = 1000
     private val userName by lazy { auth.currentUser?.displayName ?: ANONYMOUS }
 
     @field:[Inject Named("messages")] lateinit var messageDatabaseReference: DatabaseReference
     @field:[Inject Named("chat_photos")] lateinit var chatPhotoStorageReference: StorageReference
     @Inject lateinit var auth: FirebaseAuth
     @Inject lateinit var authUI: AuthUI
+    @Inject lateinit var firebaseRemoteConfig: FirebaseRemoteConfig
     val navigationController by lazy { NavigationController(this, authUI) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,14 +65,14 @@ class SignedInActivity : AppCompatActivity() {
             sendButton.isEnabled = s?.isNotEmpty() ?: false
         }
 
-        messageEditText.filters = arrayOf(InputFilter.LengthFilter(DEFAULT_MSG_LENGTH_LIMIT))
-
         sendButton.setOnClickListener {
             val message = FriendlyMessage(messageEditText.text.toString(), userName, null)
             messageDatabaseReference.push().setValue(message)
             messageEditText.setText("")
         }
         messageDatabaseReference.addChildEventListener(MessageEventListener(messageAdapter))
+
+        fetchConfig()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -103,5 +111,28 @@ class SignedInActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun fetchConfig() {
+        val cacheExpiration =
+                if (firebaseRemoteConfig.info.configSettings.isDeveloperModeEnabled)
+                    0L
+                else
+                    3600L
+        firebaseRemoteConfig.fetch(cacheExpiration)
+                .addOnSuccessListener {
+                    firebaseRemoteConfig.activateFetched()
+                    applyRetrieveLengthLimit()
+                }
+                .addOnFailureListener { exception ->
+                    Log.w(TAG, "Error fetching config ${exception}")
+                    applyRetrieveLengthLimit()
+                }
+    }
+
+    private fun applyRetrieveLengthLimit() {
+        val msgLengthLimit = firebaseRemoteConfig.getLong(FRIENDLY_MSG_LENGTH_KEY)
+        messageEditText.filters = arrayOf(InputFilter.LengthFilter(msgLengthLimit.toInt()))
+        Log.d(TAG, "$FRIENDLY_MSG_LENGTH_KEY = ${msgLengthLimit}")
     }
 }
